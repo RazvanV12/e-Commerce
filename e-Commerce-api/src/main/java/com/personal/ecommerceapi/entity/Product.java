@@ -1,9 +1,9 @@
-package com.personal.ecommerce.entity;
+package com.personal.ecommerceapi.entity;
 
-import com.personal.ecommerce.util.Brand;
-import com.personal.ecommerce.util.Category;
-import com.personal.ecommerce.util.Color;
-import com.personal.ecommerce.util.Gender;
+import com.personal.ecommerceapi.util.Brand;
+import com.personal.ecommerceapi.util.Category;
+import com.personal.ecommerceapi.util.Color;
+import com.personal.ecommerceapi.util.Gender;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

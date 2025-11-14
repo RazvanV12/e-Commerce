@@ -1,4 +1,4 @@
-package com.personal.ecommerce.entity;
+package com.personal.ecommerceapi.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

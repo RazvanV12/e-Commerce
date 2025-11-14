@@ -1,6 +1,6 @@
-package com.personal.ecommerce.entity;
+package com.personal.ecommerceapi.entity;
 
-import com.personal.ecommerce.util.OrderStatus;
+import com.personal.ecommerceapi.util.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

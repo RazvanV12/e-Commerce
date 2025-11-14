@@ -1,4 +1,4 @@
-package com.personal.ecommerce.util;
+package com.personal.ecommerceapi.util;
 
 public enum Color {
     RED,
