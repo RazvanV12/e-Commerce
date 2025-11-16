@@ -6,7 +6,7 @@ ENV MYSQL_DATABASE=ecommerce
 ENV MYSQL_USER=ecommerce_user
 ENV MYSQL_PASSWORD=ecommerce_pass
 
-COPY ./db/init/*.sql /docker-entrypoint-initdb.d/
+COPY ./init/*.sql /docker-entrypoint-initdb.d/
 
 # Portul standard MySQL
 EXPOSE 3306
