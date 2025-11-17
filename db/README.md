@@ -15,6 +15,5 @@ docker build -f Dockerfile-mysql -t ecommerce-mysql .
 Rulează următoarea comandă din folder `db` pentru a porni un container MySQL:
 
 ```bash
-docker run --name ecommerce-mysql-container ^
-  -p 3307:3306 ^
-  -d ecommerce-mysql
+docker run --name ecommerce-mysql-container -p 3307:3306 -d ecommerce-mysql
+```
