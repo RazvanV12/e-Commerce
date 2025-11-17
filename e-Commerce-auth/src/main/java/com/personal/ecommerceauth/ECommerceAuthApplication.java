@@ -9,5 +9,4 @@ public class ECommerceAuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(ECommerceAuthApplication.class, args);
     }
-
 }
