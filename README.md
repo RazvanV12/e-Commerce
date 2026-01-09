@@ -177,31 +177,6 @@ kubectl get svc -n ecommerce
 kubectl logs -n ecommerce -l app=mysql --tail=50
 ```
 
-### Verificare bază de date MySQL
-
-Pentru a verifica faptul că MySQL rulează corect și că bazele de date au fost create automat,
-am rulat următoarea comandă:
-
-```bash
-kubectl exec -n ecommerce -it deploy/mysql -- \
-  mysql -uroot -p'rootpass' -e "SHOW DATABASES;"
-```
-
-### Verificare bază de date MySQL
-
-Pentru a verifica faptul că MySQL rulează corect și că bazele de date au fost create automat,
-am rulat următoarea comandă:
-
-```bash
-kubectl exec -n ecommerce -it deploy/mysql -- \
-  mysql -uroot -p'rootpass' -e "SHOW DATABASES;"
-```
-
-Configurația bazei de date pentru auth-service este injectată prin variabile de mediu
-definite în Kubernetes (Deployment), conform principiilor cloud-native.
-
-Setările din application.properties sunt suprascrise la rularea în cluster.
-
 dupa modif din application.properties
 ```bash
 docker build -t ecommerce-auth:local services/auth-service
@@ -265,3 +240,30 @@ ce ports are
 ce volume are
 Events (cea mai importantă parte)
 → aici vezi de ce nu pornește: ImagePull, CrashLoopBackOff, etc.
+
+
+
+### Verificare bază de date MySQL
+
+Pentru a verifica faptul că MySQL rulează corect și că bazele de date au fost create automat,
+am rulat următoarea comandă:
+
+```bash
+kubectl exec -n ecommerce -it deploy/mysql -- \
+  mysql -uroot -p'rootpass' -e "SHOW DATABASES;"
+```
+
+### Verificare bază de date MySQL
+
+Pentru a verifica faptul că MySQL rulează corect și că bazele de date au fost create automat,
+am rulat următoarea comandă:
+
+```bash
+kubectl exec -n ecommerce -it deploy/mysql -- \
+  mysql -uroot -p'rootpass' -e "SHOW DATABASES;"
+```
+
+Configurația bazei de date pentru auth-service este injectată prin variabile de mediu
+definite în Kubernetes (Deployment), conform principiilor cloud-native.
+
+Setările din application.properties sunt suprascrise la rularea în cluster.
