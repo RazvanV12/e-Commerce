@@ -267,3 +267,16 @@ Configurația bazei de date pentru auth-service este injectată prin variabile d
 definite în Kubernetes (Deployment), conform principiilor cloud-native.
 
 Setările din application.properties sunt suprascrise la rularea în cluster.
+
+
+kubectl apply -f kubernetes/portainer-deployment.yaml
+kubectl apply -f kubernetes/portainer-service.yaml
+
+kubectl get pods -n ecommerce
+kubectl get svc  -n ecommerce
+
+http://localhost:9000
+
+kubectl create clusterrolebinding portainer-admin \
+--clusterrole=cluster-admin \
+--serviceaccount=ecommerce:default
