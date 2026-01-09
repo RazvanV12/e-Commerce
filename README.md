@@ -45,7 +45,7 @@ API/Auth: NodePort (ca să le testezi din Postman)
 ## 3. Creare cluster local folosind Kind
 
 ```bash
-kind create cluster --name ecommerce
+kind create cluster --name ecommerce --image kindest/node:v1.34.0
 ```
 kind este un utilitar care creează un cluster Kubernetes local folosind Docker, iar kubectl este tool-ul CLI prin care administrăm resursele din cluster, precum pods, services și deployments.
 
