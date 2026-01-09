@@ -64,6 +64,13 @@ local-path-storage   Active   21m
 ```
 - Putem vedea aici mai multe namespace-uri implicite create de Kubernetes, printre care si cel definit de noi, ecommerce.
 
+- Setam namespace-ul nostru ca valoare default pentru a nu mai fi nevoie sa adaugam -n ecommerce la fiecare comanda
+  kubectl
+
+```bash
+kubectl config set-context --current --namespace=ecommerce
+```
+
 ## Pas 5: Deploy MySQL
 
 - MySQL necesita credentiale, configurare si storage, deci resursele sunt aplicate
@@ -105,6 +112,18 @@ STATUS Running
 ```bash
 kubectl -n ecommerce apply -f kubernetes/auth-deployment.yaml
 kubectl -n ecommerce apply -f kubernetes/api-deployment.yaml
+```
+
+- Build docker images
+```bash 
+docker build -t ecommerce-auth:local services/auth-service
+docker build -t ecommerce-api:local  services/api-service
+```
+
+- Load docker images in kind
+```bash
+kind load docker-image ecommerce-auth:local --name ecommerce
+kind load docker-image ecommerce-api:local  --name ecommerce
 ```
 
 ## Pas 8: Verificare Pods si Services
@@ -151,7 +170,12 @@ http://localhost:30081
 - Deploy Adminer
 ```bash
 kubectl apply -f kubernetes/adminer-deployment.yaml
-kubectl apply -f kubernetes/adminer-service.yaml
+```
+
+- URL Adminer:
+
+```aiignore
+http://localhost:30083
 ```
 
 
@@ -170,7 +194,6 @@ kubectl get svc  -n ecommerce
 - Deploy Portainer
 ```bash
 kubectl apply -f kubernetes/portainer-deployment.yaml
-kubectl apply -f kubernetes/portainer-service.yaml
 ```
 
 ## Verificare Portainer Pod si Service
@@ -181,7 +204,7 @@ kubectl get svc  -n ecommerce
 
 - URL Portainer:
 ```aiignore
-http://localhost:9000
+http://localhost:30090
 ```
 
 - Dupa ce creem un cont nou, pentru a avea access la namespace-ul ecommerce,
