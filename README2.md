@@ -179,3 +179,24 @@ kind delete cluster --name ecommerce
 ```bash
 kubectl delete namespace ecommerce
 ```
+
+### Microserviciul 4 (Adminer)
+```bash
+kubectl apply -f kubernetes/adminer-deployment.yaml
+kubectl apply -f kubernetes/adminer-service.yaml
+
+kubectl get pods -n ecommerce
+kubectl get svc  -n ecommerce
+```
+
+### Accesare adminer in browser Kind
+
+```bash
+kubectl port-forward -n ecommerce svc/adminer 8082:8080
+```
+
+### Deschidere in browser
+
+```bash
+kubectl port-forward -n ecommerce svc/adminer 8082:8080
+```
