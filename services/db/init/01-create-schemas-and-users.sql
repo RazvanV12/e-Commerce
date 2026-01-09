@@ -1,0 +1,13 @@
+CREATE DATABASE IF NOT EXISTS ecommerce_api;
+
+CREATE DATABASE IF NOT EXISTS ecommerce_auth;
+
+
+CREATE USER IF NOT EXISTS 'ecommerce_user'@'%' IDENTIFIED BY 'ecommerce_pass';
+
+
+GRANT ALL PRIVILEGES ON ecommerce_api.* TO 'ecommerce_user'@'%';
+GRANT ALL PRIVILEGES ON ecommerce_auth.* TO 'ecommerce_user'@'%';
+
+FLUSH
+PRIVILEGES;

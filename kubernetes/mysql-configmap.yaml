@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: ecommerce
+data:
+  MYSQL_USER: "ecommerce_user"
