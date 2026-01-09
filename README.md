@@ -26,7 +26,7 @@ Aplicația este compusă din următoarele microservicii:
 ```bash
 docker build -t ecommerce-auth:local services/auth-service
 ```
-### Auth API
+### Business API
 ```bash
 docker build -t ecommerce-api:local services/api-service
 ```
@@ -45,7 +45,7 @@ API/Auth: NodePort (ca să le testezi din Postman)
 ## 3. Creare cluster local folosind Kind
 
 ```bash
-kind create cluster --name ecommerce
+kind create cluster --name ecommerce --image kindest/node:v1.34.0
 ```
 kind este un utilitar care creează un cluster Kubernetes local folosind Docker, iar kubectl este tool-ul CLI prin care administrăm resursele din cluster, precum pods, services și deployments.
 
@@ -195,3 +195,73 @@ am rulat următoarea comandă:
 ```bash
 kubectl exec -n ecommerce -it deploy/mysql -- \
   mysql -uroot -p'rootpass' -e "SHOW DATABASES;"
+```
+
+Configurația bazei de date pentru auth-service este injectată prin variabile de mediu
+definite în Kubernetes (Deployment), conform principiilor cloud-native.
+
+Setările din application.properties sunt suprascrise la rularea în cluster.
+
+dupa modif din application.properties
+```bash
+docker build -t ecommerce-auth:local services/auth-service
+```
+
+se incarca in kind
+```bash
+kind load docker-image ecommerce-auth:local --name ecommerce
+```
+restart deployment
+```bash
+kubectl rollout restart deployment/auth-service -n ecommerce
+
+```
+
+
+deci dupa creare yaml pt api si auth
+
+```bash
+# build
+docker build -t ecommerce-auth:local services/auth-service
+docker build -t ecommerce-api:local  services/api-service
+
+# load in kind
+kind load docker-image ecommerce-auth:local --name ecommerce
+kind load docker-image ecommerce-api:local  --name ecommerce
+
+# apply k8s
+kubectl apply -f kubernetes/auth-deployment.yaml
+kubectl apply -f kubernetes/api-deployment.yaml
+
+# verify
+kubectl get pods -n ecommerce
+kubectl get svc -n ecommerce
+```
+
+OUTPUT
+```bash
+karlaniculae@Alexes-MacBook-Air e-Commerce % kubectl get pods -n ecommerce
+NAME                            READY   STATUS             RESTARTS   AGE
+api-service-59d665d94c-bmcjz    0/1     Pending            0          0s
+auth-service-7b59775dc8-lstfz   0/1     ImagePullBackOff   0          32m
+mysql-5d47c9d6b7-gnjlj          1/1     Running            0          169m
+karlaniculae@Alexes-MacBook-Air e-Commerce % kubectl get svc -n ecommerce
+NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+api-service    NodePort    10.96.55.56     <none>        8080:30080/TCP   0s
+auth-service   NodePort    10.96.222.115   <none>        8081:30081/TCP   32m
+mysql          ClusterIP   10.96.186.94    <none>        3306/TCP         169m
+```
+
+```bash
+ e-Commerce % kubectl get pods -n ecommerce
+kubectl describe pod -n ecommerce -l app=api-service | tail -n 30
+```
+describe îți arată detalii complete despre un pod, nu doar statusul scurt din get pods.
+Include:
+pe ce node rulează
+ce image folosește
+ce env vars are
+ce ports are
+ce volume are
+Events (cea mai importantă parte)
+→ aici vezi de ce nu pornește: ImagePull, CrashLoopBackOff, etc.
