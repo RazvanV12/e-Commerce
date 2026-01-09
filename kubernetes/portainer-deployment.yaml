@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: adminer
+  name: portainer
   namespace: ecommerce
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: adminer
+      app: portainer
   template:
     metadata:
       labels:
-        app: adminer
+        app: portainer
     spec:
       containers:
-        - name: adminer
-          image: adminer:4.8.1
+        - name: portainer
+          image: portainer/portainer-ce:2.19.5
           ports:
-            - containerPort: 8080
+            - containerPort: 9000
