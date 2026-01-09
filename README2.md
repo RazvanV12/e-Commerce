@@ -143,6 +143,54 @@ http://localhost:30080
 http://localhost:30081
 ```
 
+## Pas 10: Adminer 
+- La fel ca la api-serice si auth-service, am pus in fisierul kind-config extraPortMappings
+  pentru a putea accesa Adminer din host la portul 30082
+
+
+- Deploy Adminer
+```bash
+kubectl apply -f kubernetes/adminer-deployment.yaml
+kubectl apply -f kubernetes/adminer-service.yaml
+```
+
+
+## Verificare Adminer Pod si Service
+```bash
+kubectl get pods -n ecommerce
+kubectl get svc  -n ecommerce
+```
+
+
+## Pas 11: Portainer
+- Portainer este un tool de management pentru Docker si Kubernetes.
+- La fel ca la Adminer, am pus in fisierul kind-config extraPortMappings
+  pentru a putea accesa Portainer din host la portul 9000
+
+- Deploy Portainer
+```bash
+kubectl apply -f kubernetes/portainer-deployment.yaml
+kubectl apply -f kubernetes/portainer-service.yaml
+```
+
+## Verificare Portainer Pod si Service
+```bash
+kubectl get pods -n ecommerce
+kubectl get svc  -n ecommerce
+```
+
+- URL Portainer:
+```aiignore
+http://localhost:9000
+```
+
+- Dupa ce creem un cont nou, pentru a avea access la namespace-ul ecommerce,
+  cream un clusterrolebinding si refreshuim pagina.
+```bash
+kubectl create clusterrolebinding portainer-admin --clusterrole=cluster-admin --serviceaccount=ecommerce:default
+```
+
+
 
 ## Comenzi utile pentru debug: 
 
@@ -180,23 +228,3 @@ kind delete cluster --name ecommerce
 kubectl delete namespace ecommerce
 ```
 
-### Microserviciul 4 (Adminer)
-```bash
-kubectl apply -f kubernetes/adminer-deployment.yaml
-kubectl apply -f kubernetes/adminer-service.yaml
-
-kubectl get pods -n ecommerce
-kubectl get svc  -n ecommerce
-```
-
-### Accesare adminer in browser Kind
-
-```bash
-kubectl port-forward -n ecommerce svc/adminer 8082:8080
-```
-
-### Deschidere in browser
-
-```bash
-kubectl port-forward -n ecommerce svc/adminer 8082:8080
-```
