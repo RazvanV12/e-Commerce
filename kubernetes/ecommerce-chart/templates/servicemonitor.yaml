@@ -1,0 +1,28 @@
+{{- $root := . -}}
+{{- $monitoringNs := ($root.Values.monitoring.namespace | default "monitoring") -}}
+{{- $targetNs := ($root.Values.namespace | default $root.Release.Namespace) -}}
+
+{{- range $key, $svc := dict "api" $root.Values.services.api "auth" $root.Values.services.auth }}
+{{- if and $svc $svc.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $svc.name }}-monitor
+  namespace: {{ $monitoringNs }}
+  labels:
+    release: monitoring
+    app: {{ $svc.appLabel }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ $svc.appLabel }}
+  namespaceSelector:
+    matchNames:
+      - {{ $targetNs }}
+  endpoints:
+    - port: {{ $svc.portName | default "http" }}
+      path: /actuator/prometheus
+      interval: 15s
+---
+{{- end }}
+{{- end }}
