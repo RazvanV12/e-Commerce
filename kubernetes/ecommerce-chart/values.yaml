@@ -1,0 +1,174 @@
+namespace: ecommerce
+
+deployments:
+  adminer:
+    enabled: true
+    name: adminer
+    appLabel: adminer
+    replicas: 1
+    image: adminer:4.8.1
+    containerPort: 8080
+
+  api:
+    enabled: true
+    name: api-service
+    appLabel: api-service
+    replicas: 1
+    image: ecommerce-api:local
+    containerPort: 8080
+    env:
+      - name: SPRING_DATASOURCE_URL
+        value: jdbc:mysql://mysql:3306/ecommerce_api
+      - name: SPRING_DATASOURCE_USERNAME
+        value: ecommerce_user
+      - name: SPRING_DATASOURCE_PASSWORD
+        value: ecommerce_pass
+      - name: SERVER_PORT
+        value: "8080"
+
+  auth:
+    enabled: true
+    name: auth-service
+    appLabel: auth-service
+    replicas: 1
+    image: ecommerce-auth:local
+    containerPort: 8081
+    env:
+      - name: SPRING_DATASOURCE_URL
+        value: jdbc:mysql://mysql:3306/ecommerce_auth
+      - name: SPRING_DATASOURCE_USERNAME
+        value: ecommerce_user
+      - name: SPRING_DATASOURCE_PASSWORD
+        value: ecommerce_pass
+
+  mysql:
+    enabled: true
+    name: mysql
+    appLabel: mysql
+    replicas: 1
+    image: mysql:8.0
+    containerPort: 3306
+    envFrom:
+      - configMapRef:
+          name: mysql-config
+      - secretRef:
+          name: mysql-secret
+    volumeMounts:
+      - name: mysql-storage
+        mountPath: /var/lib/mysql
+      - name: mysql-initdb
+        mountPath: /docker-entrypoint-initdb.d
+    volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+      - name: mysql-initdb
+        configMap:
+          name: mysql-initdb
+
+  portainer:
+    enabled: true
+    name: portainer
+    appLabel: portainer
+    replicas: 1
+    image: portainer/portainer-ce:2.19.5
+    containerPort: 9000
+
+
+services:
+  api:
+    enabled: true
+    name: api-service
+    appLabel: api-service
+    type: NodePort
+    port: 8080
+    targetPort: 8080
+    nodePort: 30080
+
+  auth:
+    enabled: true
+    name: auth-service
+    appLabel: auth-service
+    type: NodePort
+    port: 8081
+    targetPort: 8081
+    nodePort: 30081
+
+  adminer:
+    enabled: true
+    name: adminer
+    appLabel: adminer
+    type: NodePort
+    port: 8080
+    targetPort: 8080
+    nodePort: 30083
+
+  portainer:
+    enabled: true
+    name: portainer
+    appLabel: portainer
+    type: NodePort
+    port: 9000
+    targetPort: 9000
+    nodePort: 30090
+
+  mysql:
+    enabled: true
+    name: mysql
+    appLabel: mysql
+    type: ClusterIP
+    port: 3306
+    targetPort: 3306
+
+
+
+mysql:
+  enabled: true
+
+  pv:
+    enabled: true
+    name: mysql-pv
+    storageClassName: manual
+    size: 1Gi
+    accessModes:
+      - ReadWriteOnce
+    hostPath:
+      path: /mnt/mysql-data
+      type: DirectoryOrCreate
+
+  pvc:
+    enabled: true
+    name: mysql-pvc
+    storageClassName: manual
+    size: 1Gi
+    accessModes:
+      - ReadWriteOnce
+
+  secret:
+    enabled: true
+    name: mysql-secret
+    type: Opaque
+    stringData:
+      MYSQL_ROOT_PASSWORD: "rootpass"
+      MYSQL_PASSWORD: "ecommerce_pass"
+
+  configMap:
+    enabled: true
+    name: mysql-config
+    data:
+      MYSQL_USER: "ecommerce_user"
+
+  initdbConfigMap:
+    enabled: true
+    name: mysql-initdb
+    data:
+      01-init.sql: |
+        CREATE DATABASE IF NOT EXISTS ecommerce_api;
+        CREATE DATABASE IF NOT EXISTS ecommerce_auth;
+
+        CREATE USER IF NOT EXISTS 'ecommerce_user'@'%' IDENTIFIED BY 'ecommerce_pass';
+
+        GRANT ALL PRIVILEGES ON ecommerce_api.* TO 'ecommerce_user'@'%';
+        GRANT ALL PRIVILEGES ON ecommerce_auth.* TO 'ecommerce_user'@'%';
+
+        FLUSH PRIVILEGES;

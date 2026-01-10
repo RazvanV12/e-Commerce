@@ -1,0 +1,20 @@
+{{- range $key, $svc := .Values.services }}
+{{- if $svc.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $svc.name }}
+  namespace: {{ $.Values.namespace | default $.Release.Namespace }}
+spec:
+  type: {{ $svc.type | default "ClusterIP" }}
+  selector:
+    app: {{ $svc.appLabel }}
+  ports:
+    - port: {{ $svc.port }}
+      targetPort: {{ $svc.targetPort }}
+      {{- if eq ($svc.type | default "ClusterIP") "NodePort" }}
+      nodePort: {{ $svc.nodePort }}
+      {{- end }}
+---
+{{- end }}
+{{- end }}

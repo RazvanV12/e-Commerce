@@ -206,7 +206,7 @@ kind load docker-image ecommerce-api:local  --name ecommerce
 
 # apply k8s
 kubectl apply -f kubernetes/auth-deployment.yaml
-kubectl apply -f kubernetes/api-deployment.yaml
+kubectl apply -f kubernetes/api.yaml
 
 # verify
 kubectl get pods -n ecommerce

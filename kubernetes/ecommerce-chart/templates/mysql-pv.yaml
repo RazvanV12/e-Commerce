@@ -1,0 +1,15 @@
+{{- if and .Values.mysql .Values.mysql.enabled .Values.mysql.pv.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.mysql.pv.name }}
+spec:
+  storageClassName: {{ .Values.mysql.pv.storageClassName }}
+  capacity:
+    storage: {{ .Values.mysql.pv.size }}
+  accessModes:
+{{- toYaml .Values.mysql.pv.accessModes | nindent 4 }}
+  hostPath:
+    path: {{ .Values.mysql.pv.hostPath.path }}
+    type: {{ .Values.mysql.pv.hostPath.type }}
+{{- end }}
