@@ -1,0 +1,45 @@
+{{- range $key, $dep := .Values.deployments }}
+{{- if $dep.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $dep.name }}
+  namespace: {{ $.Values.namespace | default $.Release.Namespace }}
+spec:
+  replicas: {{ $dep.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ $dep.appLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ $dep.appLabel }}
+    spec:
+      containers:
+        - name: {{ $dep.name }}
+          image: {{ $dep.image }}
+          ports:
+            - containerPort: {{ $dep.containerPort }}
+
+          {{- if $dep.env }}
+          env:
+            {{- toYaml $dep.env | nindent 12 }}
+          {{- end }}
+
+          {{- if $dep.envFrom }}
+          envFrom:
+            {{- toYaml $dep.envFrom | nindent 12 }}
+          {{- end }}
+
+          {{- if $dep.volumeMounts }}
+          volumeMounts:
+            {{- toYaml $dep.volumeMounts | nindent 12 }}
+          {{- end }}
+
+      {{- if $dep.volumes }}
+      volumes:
+        {{- toYaml $dep.volumes | nindent 8 }}
+      {{- end }}
+---
+{{- end }}
+{{- end }}

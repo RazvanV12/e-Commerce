@@ -1,0 +1,14 @@
+{{- if and .Values.mysql .Values.mysql.enabled .Values.mysql.pvc.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.mysql.pvc.name }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+spec:
+  storageClassName: {{ .Values.mysql.pvc.storageClassName }}
+  accessModes:
+{{- toYaml .Values.mysql.pvc.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.mysql.pvc.size }}
+{{- end }}

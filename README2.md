@@ -111,7 +111,7 @@ STATUS Running
 - Aplicatiile backend ruleaza ca Deployments si sunt expuse prin NodePort.
 ```bash
 kubectl -n ecommerce apply -f kubernetes/auth-deployment.yaml
-kubectl -n ecommerce apply -f kubernetes/api-deployment.yaml
+kubectl -n ecommerce apply -f kubernetes/api.yaml
 ```
 
 - Build docker images

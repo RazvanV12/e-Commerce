@@ -1,0 +1,9 @@
+{{- if and .Values.mysql .Values.mysql.enabled .Values.mysql.configMap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.mysql.configMap.name }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+data:
+{{- toYaml .Values.mysql.configMap.data | nindent 2 }}
+{{- end }}
