@@ -5,12 +5,15 @@ kind: Service
 metadata:
   name: {{ $svc.name }}
   namespace: {{ $.Values.namespace | default $.Release.Namespace }}
+  labels:
+    app: {{ $svc.appLabel }}
 spec:
   type: {{ $svc.type | default "ClusterIP" }}
   selector:
     app: {{ $svc.appLabel }}
   ports:
-    - port: {{ $svc.port }}
+    - name: {{ $svc.portName | default "http" }}
+      port: {{ $svc.port }}
       targetPort: {{ $svc.targetPort }}
       {{- if eq ($svc.type | default "ClusterIP") "NodePort" }}
       nodePort: {{ $svc.nodePort }}

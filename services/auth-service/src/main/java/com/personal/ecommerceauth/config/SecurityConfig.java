@@ -1,6 +1,5 @@
 package com.personal.ecommerceauth.config;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +21,13 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/registerUser", "/auth/login")
+                        // public endpoints
+                        .requestMatchers(
+                                "/auth/registerUser",
+                                "/auth/login",
+                                "/actuator/health",
+                                "/actuator/prometheus"
+                        )
                         .permitAll()
                         .anyRequest()
                         .authenticated()
