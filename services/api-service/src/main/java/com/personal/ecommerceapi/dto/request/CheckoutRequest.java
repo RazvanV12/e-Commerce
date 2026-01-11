@@ -10,5 +10,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CheckoutRequest {
-    private String shippingAddress; // optional
+    private String shippingAddress;
 }

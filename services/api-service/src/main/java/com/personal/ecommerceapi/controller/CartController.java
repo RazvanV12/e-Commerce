@@ -26,7 +26,6 @@ public class CartController {
         throw new IllegalStateException("Missing userId attribute (JWT not processed?)");
     }
 
-    // POST /cart/items  adaugare produse in cos
     @PostMapping("/items")
     public ResponseEntity<Void> addToCart(HttpServletRequest request,
                                           @Valid @RequestBody AddToCartRequest body) {
@@ -34,13 +33,11 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    // GET /cart returnare cos (items si total)
     @GetMapping
     public CartResponse getCart(HttpServletRequest request) {
         return cartService.getCart(userId(request));
     }
 
-    // PATCH /cart/items/{productId} setare cantitate
     @PatchMapping("/items/{productId}")
     public ResponseEntity<Void> updateQuantity(HttpServletRequest request,
                                                @PathVariable Long productId,
@@ -49,14 +46,12 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    // DELETE /cart/items/{productId} stergere produs din cos
     @DeleteMapping("/items/{productId}")
     public ResponseEntity<Void> removeItem(HttpServletRequest request, @PathVariable Long productId) {
         cartService.removeItem(userId(request), productId);
         return ResponseEntity.noContent().build();
     }
 
-    // DELETE /cart/clear golire cos
     @DeleteMapping("/clear")
     public ResponseEntity<Void> clear(HttpServletRequest request) {
         cartService.clearCart(userId(request));

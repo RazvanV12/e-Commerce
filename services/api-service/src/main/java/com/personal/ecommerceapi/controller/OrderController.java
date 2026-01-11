@@ -32,7 +32,6 @@ public class OrderController {
         return val == null ? null : val.toString();
     }
 
-    // POST /orders/checkout
     @PostMapping("/checkout")
     public CheckoutResponse checkout(HttpServletRequest request,
                                      @RequestBody(required = false) CheckoutRequest body) {
@@ -47,13 +46,11 @@ public class OrderController {
         return orderService.checkout(userId(request), userEmail, shipping);
     }
 
-    // GET /orders
     @GetMapping
     public List<OrderResponse> myOrders(HttpServletRequest request) {
         return orderService.myOrders(userId(request));
     }
 
-    // GET /orders/{id}
     @GetMapping("/{id}")
     public OrderResponse myOrderById(HttpServletRequest request, @PathVariable Long id) {
         return orderService.myOrderById(userId(request), id);

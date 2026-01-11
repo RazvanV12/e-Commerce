@@ -16,7 +16,6 @@ spec:
         app: {{ $dep.appLabel }}
     spec:
 
-      {{- /* initContainers doar pt api si auth (sau pt orice dep care are waitForMysql=true) */}}
       {{- if $dep.waitForMysql }}
       initContainers:
         - name: wait-for-mysql
