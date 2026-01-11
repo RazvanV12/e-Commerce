@@ -1,0 +1,20 @@
+grafana:
+  persistence:
+    enabled: true
+    size: 2Gi
+    type: pvc
+    adminPassword: "grafana_pass"
+  initChownData:
+    enabled: false
+  securityContext:
+    fsGroup: 472
+
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          resources:
+            requests:
+              storage: 5Gi
