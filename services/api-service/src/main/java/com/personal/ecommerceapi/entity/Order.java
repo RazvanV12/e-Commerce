@@ -46,11 +46,18 @@ public class Order {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "paid_at")
+    private LocalDateTime paidAt;
+
+
+
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+
+
     private List<OrderItem> items = new ArrayList<>();
 
     public void addItem(OrderItem item) {

@@ -47,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String email = jwtService.getEmail(claims);
             String role = jwtService.getRole(claims);
 
-            // punem userId/email ca attributes ca sa le folosim simplu în controllers
+
             request.setAttribute("userId", userId);
             request.setAttribute("email", email);
 

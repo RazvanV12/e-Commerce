@@ -57,7 +57,7 @@ public class CartService {
         List<CartItem> items = cartItemRepository.findByUserId(userId);
 
         List<CartItemResponse> respItems = items.stream().map(ci -> {
-            Product p = ci.getProduct(); // LAZY, dar suntem în tranzacție readOnly -> ok
+            Product p = ci.getProduct();
             BigDecimal unit = p.getPrice();
             BigDecimal line = unit.multiply(BigDecimal.valueOf(ci.getQuantity()));
             return new CartItemResponse(
