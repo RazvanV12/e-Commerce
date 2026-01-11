@@ -31,7 +31,7 @@ kind delete cluster --name ecommerce
 ### Pas 2: Creare cluster local folosind Kind
 
 ```bash
-kind create cluster --name ecommerce --image kindest/node:v1.34.0 --config kubernetes/kind-config.yaml
+kind create cluster --name ecommerce --image kindest/node:v1.34.0 --config kubernetes/kind/kind-config.yaml
 ```
 
 ### Pas 3: Verificare
@@ -68,7 +68,7 @@ docker exec -it ecommerce-control-plane crictl images
 ## Pas 6. Adaugam repo helm pentru ingress-nginx
 
 - Ingress-nginx va fi folosit pentru a expune serviciile in afara cluster-ului
-- 
+
 ```bash
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
@@ -79,8 +79,12 @@ helm repo update
 
 ```bash
 helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-  -n ingress-nginx \
-  --create-namespace
+  -n ingress-nginx --create-namespace \
+  --set controller.kind=DaemonSet \
+  --set controller.hostPort.enabled=true \
+  --set controller.hostPort.ports.http=80 \
+  --set controller.hostPort.ports.https=443 \
+  --set controller.service.type=ClusterIP
 ```
 
 ## Pas 8. Verificare ingress-nginx
@@ -179,7 +183,7 @@ kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-s
 
 - Puteti importa dashboard-ul realizat de noi pentru monitorizarea aplicatiei e-commerce din grafana/dashboards/Dashboard.json
 
-- Putem accesa portainer la adresa: 
+## Pas 14.  Putem accesa portainer la adresa: 
 
 ```aiignore
 http://localhost:30090
@@ -192,7 +196,7 @@ kubectl create clusterrolebinding portainer-admin \
 --serviceaccount=ecommerce:default
 ```
 
-- Pute accesa adminer la adresa:
+## Pas 15. Putem accesa adminer la adresa:
 
 ```aiignore
 http://localhost:30083
@@ -208,7 +212,7 @@ Password: ecommerce_pass
 Database: ecommerce_auth ( sau ecommerce_api )
 ```
 
-## Pas 14: Accesare servicii din Postman
+## Pas 16: Accesare servicii din Postman
 
 - Datorita faptului ca am folosit Ingress-Nginx pentru a expune serviciile in afara cluster-ului,
   putem accesa serviciile folosind urmatoarele URL-uri ( in functie de prefix api/auth se va face routing-ul catre
@@ -229,7 +233,7 @@ http://localhost:8088/auth/
 - Au fost adaugate colectii postman in modulele api-service, respectiv auth-service pentru a folosi endpoint-urile noastre 
 
 
-## Linkuri utile
+## Comenzi utile
 
 - Verificare pods si servicii in namespace ecommerce
 
