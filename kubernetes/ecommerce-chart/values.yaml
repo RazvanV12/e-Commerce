@@ -16,7 +16,7 @@ deployments:
     enabled: true
     name: api-service
     appLabel: api-service
-    replicas: 1
+    replicas: 2
     image: ecommerce-api:local
     imagePullPolicy: IfNotPresent
     containerPort: 8080
@@ -37,7 +37,7 @@ deployments:
     enabled: true
     name: auth-service
     appLabel: auth-service
-    replicas: 1
+    replicas: 2
     image: ecommerce-auth:local
     imagePullPolicy: IfNotPresent
     containerPort: 8080
@@ -93,21 +93,21 @@ services:
     enabled: true
     name: api-service
     appLabel: api-service
-    type: NodePort
+    type: ClusterIP
     port: 8080
     targetPort: 8080
     portName: http
-    nodePort: 30080
+    nodePort: null
 
   auth:
     enabled: true
     name: auth-service
     appLabel: auth-service
-    type: NodePort
+    type: ClusterIP
     port: 8080
     targetPort: 8080
     portName: http
-    nodePort: 30081
+    nodePort: null
 
   adminer:
     enabled: true
@@ -135,6 +135,25 @@ services:
     port: 3306
     targetPort: 3306
 
+
+ingress:
+  enabled: true
+  name: ecommerce-ingress
+  ingressClassName: nginx
+
+  # Routes: lista de path-uri și backend-uri
+  routes:
+    - enabled: true
+      path: /api
+      pathType: Prefix
+      serviceKey: api
+      servicePort: 8080
+
+    - enabled: true
+      path: /auth
+      pathType: Prefix
+      serviceKey: auth
+      servicePort: 8080
 
 
 mysql:
