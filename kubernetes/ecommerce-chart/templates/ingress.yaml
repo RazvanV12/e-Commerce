@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled }}
+{{- $ns := (.Values.namespace | default .Release.Namespace) -}}
+{{- $ing := .Values.ingress -}}
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $ing.name | default "ecommerce-ingress" }}
+  namespace: {{ $ns }}
+spec:
+  ingressClassName: {{ $ing.ingressClassName | default "nginx" }}
+  rules:
+    - http:
+        paths:
+          {{- range $route := $ing.routes }}
+          {{- if $route.enabled }}
+          {{- $svc := (index $.Values.services $route.serviceKey) }}
+          {{- if not $svc }}
+          {{- fail (printf "Ingress route serviceKey '%s' not found in .Values.services" $route.serviceKey) }}
+          {{- end }}
+          - path: {{ $route.path }}
+            pathType: {{ $route.pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ $svc.name }}
+                port:
+                  number: {{ $route.servicePort | default $svc.port }}
+          {{- end }}
+          {{- end }}
+{{- end }}
