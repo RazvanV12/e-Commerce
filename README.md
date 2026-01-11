@@ -280,3 +280,11 @@ http://localhost:9000
 kubectl create clusterrolebinding portainer-admin \
 --clusterrole=cluster-admin \
 --serviceaccount=ecommerce:default
+
+
+
+## Get grafana local instance passowrd: 
+
+```bash
+kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo
+```
