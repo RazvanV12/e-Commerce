@@ -232,6 +232,8 @@ http://localhost:8088/auth/
 
 - Au fost adaugate colectii postman in modulele api-service, respectiv auth-service pentru a folosi endpoint-urile noastre 
 
+- Am folosit ingress-nginx pentru load balancing intre cele 2 replici ale fiecarui serviciu ( api si auth ), acest lucru se poate observa si in grafana ( avem cate 2 pod-uri pentru fiecare serviciu ), dar se pot face si mai multe request-uri catre acelasi serviciu si putem verifica log-urile pod-urilor pentru a vedea cum sunt distribuite request-urile intre cele 2 replici.
+
 
 ## Comenzi utile
 
