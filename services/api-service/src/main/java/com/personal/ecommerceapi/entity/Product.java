@@ -5,7 +5,9 @@ import com.personal.ecommerceapi.util.Category;
 import com.personal.ecommerceapi.util.Color;
 import com.personal.ecommerceapi.util.Gender;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -18,6 +20,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Table(name = "product")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Product {
 
     @Id
