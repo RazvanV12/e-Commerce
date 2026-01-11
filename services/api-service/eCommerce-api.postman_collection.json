@@ -1,0 +1,320 @@
+{
+	"info": {
+		"_postman_id": "700fee59-7e6e-4b88-8101-92e1939965bd",
+		"name": "eCommerce-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43477413"
+	},
+	"item": [
+		{
+			"name": "Get products",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Add product to cart",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwic3ViIjoidGVzdEB0ZXN0LmNvbSIsImlhdCI6MTc2ODE0ODgwMCwiZXhwIjoxNzY4MTUyNDAwfQ.bGED2bPRYNJYzyuWSChp1tWjR81NlMHN6R7BDHHlFXRz-Af5kLpeC3bhO9PtVFgG",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"productId\": 1,\r\n    \"quantity\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/cart/items",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"cart",
+						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Remove product",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwic3ViIjoidGVzdEB0ZXN0LmNvbSIsImlhdCI6MTc2ODE0ODgwMCwiZXhwIjoxNzY4MTUyNDAwfQ.bGED2bPRYNJYzyuWSChp1tWjR81NlMHN6R7BDHHlFXRz-Af5kLpeC3bhO9PtVFgG",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/cart/items/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"cart",
+						"items",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change quantity",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwic3ViIjoidGVzdEB0ZXN0LmNvbSIsImlhdCI6MTc2ODE0ODgwMCwiZXhwIjoxNzY4MTUyNDAwfQ.bGED2bPRYNJYzyuWSChp1tWjR81NlMHN6R7BDHHlFXRz-Af5kLpeC3bhO9PtVFgG",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"quantity\": 2\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/cart/items/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"cart",
+						"items",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwic3ViIjoidGVzdEB0ZXN0LmNvbSIsImlhdCI6MTc2ODE0ODgwMCwiZXhwIjoxNzY4MTUyNDAwfQ.bGED2bPRYNJYzyuWSChp1tWjR81NlMHN6R7BDHHlFXRz-Af5kLpeC3bhO9PtVFgG",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/cart/clear",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"cart",
+						"clear"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get orders",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwic3ViIjoidGVzdEB0ZXN0LmNvbSIsImlhdCI6MTc2ODE0ODgwMCwiZXhwIjoxNzY4MTUyNDAwfQ.bGED2bPRYNJYzyuWSChp1tWjR81NlMHN6R7BDHHlFXRz-Af5kLpeC3bhO9PtVFgG",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Checkout order",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwic3ViIjoidGVzdEB0ZXN0LmNvbSIsImlhdCI6MTc2ODE0ODgwMCwiZXhwIjoxNzY4MTUyNDAwfQ.bGED2bPRYNJYzyuWSChp1tWjR81NlMHN6R7BDHHlFXRz-Af5kLpeC3bhO9PtVFgG",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"shippingAddress\": \"TESTTESTTEST\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/orders/checkout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"orders",
+						"checkout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get order by id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwic3ViIjoidGVzdEB0ZXN0LmNvbSIsImlhdCI6MTc2ODE0ODgwMCwiZXhwIjoxNzY4MTUyNDAwfQ.bGED2bPRYNJYzyuWSChp1tWjR81NlMHN6R7BDHHlFXRz-Af5kLpeC3bhO9PtVFgG",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/orders/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"orders",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pay order",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwic3ViIjoidGVzdEB0ZXN0LmNvbSIsImlhdCI6MTc2ODE0ODgwMCwiZXhwIjoxNzY4MTUyNDAwfQ.bGED2bPRYNJYzyuWSChp1tWjR81NlMHN6R7BDHHlFXRz-Af5kLpeC3bhO9PtVFgG",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orderId\": 1,\r\n    \"amount\": 699.99\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/orders/pay",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"orders",
+						"pay"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -21,7 +21,6 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // public endpoints
                         .requestMatchers(
                                 "/auth/registerUser",
                                 "/auth/login",

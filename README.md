@@ -1,290 +1,326 @@
 # e-Commerce – Cloud Native Microservices Application
 
-Acest proiect reprezintă o aplicație cloud-native bazată pe microservicii,
-dezvoltată în cadrul laboratorului de Cloud Computing.
+Acest proiect reprezinta o aplicatie cloud-native bazata pe microservicii.
 
-## Arhitectură
-Aplicația este compusă din următoarele microservicii:
-- auth-service – autentificare și autorizare utilizatori
-- api-service – logică de business (produse, comenzi, coș)
-- db – MySQL (stocare persistentă)
-- adminer – interfață de administrare DB
-- portainer – interfață de administrare cluster/containerelor
+## Arhitectura
+
+Aplicatia este compusa din urmatoarele microservicii:
+
+- auth-service – autentificare si autorizare utilizatori
+- api-service – logica de business (produse, comenzi, coș)
+- db – MySQL (stocare persistenta)
+- adminer – interfata de administrare DB
+- portainer – interfata de administrare cluster/containerelor
 
 ---
 
 ## Cerințe
+
 - Docker
-- Kubernetes (Minikube / Kind)
+- Kubernetes ( Kind)
 - Helm
 
----
+## Creare cluster local folosind kind
 
-## Build imagini Docker
-
-### Auth Service
-```bash
-docker build -t ecommerce-auth:local services/auth-service
-```
-### Business API
-```bash
-docker build -t ecommerce-api:local services/api-service
-```
-
-### Verificare imagini 
-```bash
-docker images | grep ecommerce
-```
-NodePort vs ClusterIP 
-MySQL: ClusterIP (intern) 
-API/Auth: NodePort (ca să le testezi din Postman) 
-
-
-
-
-## 3. Creare cluster local folosind Kind
+### Pas 1: Stergem cluster-ul daca exista
 
 ```bash
-kind create cluster --name ecommerce --image kindest/node:v1.34.0
+kind delete cluster --name ecommerce
 ```
-kind este un utilitar care creează un cluster Kubernetes local folosind Docker, iar kubectl este tool-ul CLI prin care administrăm resursele din cluster, precum pods, services și deployments.
 
-## 4. Verificam daca s-a creat cluster-ul
+### Pas 2: Creare cluster local folosind Kind
+
+```bash
+kind create cluster --name ecommerce --image kindest/node:v1.34.0 --config kubernetes/kind-config.yaml
+```
+
+### Pas 3: Verificare
 
 ```bash
 kubectl get nodes
 ```
-Un nod este o masina din cluster. In Kind acesta este un container Docker.
-Are rol control-plane.
-``` 
+```aiignore
 NAME                      STATUS   ROLES           AGE   VERSION
-ecommerce-control-plane   Ready    control-plane   44s   v1.35.0
+ecommerce-control-plane   Ready    control-plane   19m   v1.34.0
 ```
-READY inseamna ca cluster-ul este functional.
-## 5. Creare namespace
+### Pas 4: Cream imaginile de docker ale aplicatiilor noastre ( api & auth )
+
+- Build docker images
+```bash 
+docker build -t ecommerce-auth:local services/auth-service
+docker build -t ecommerce-api:local  services/api-service
+```
+
+## Pas 5: Incarcarea imaginilor in cluster-ul kind
+
+- Load docker images in kind
 
 ```bash
-kubectl create namespace ecommerce
-kubectl config set-context --current --namespace=ecommerce
+kind load docker-image ecommerce-auth:local --name ecommerce
+kind load docker-image ecommerce-api:local  --name ecommerce
 ```
-## 5. Verificare namespace
+
+- Putem verifica imaginile in cluster folosind comanda:
+```bash
+docker exec -it ecommerce-control-plane crictl images
+```
+
+## Pas 6. Adaugam repo helm pentru ingress-nginx
+
+- Ingress-nginx va fi folosit pentru a expune serviciile in afara cluster-ului
+- 
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+```
+
+
+## Pas 7. Deploy ingress-nginx in cluster
 
 ```bash
-kubectl get ns
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+  -n ingress-nginx \
+  --create-namespace
 ```
 
-set-context face ca toate comenzile kubectl sa fie directionate catre clusterul ecommerce.
-Nu mai este nevoie sa punem -n ecommerce atunci cand dam comenzile, pentru ca vor pointa automat catre acest cluster.
-
-Un namespace NU conține fișiere, ci resurse Kubernetes.
-Într-un namespace pot exista:
-Pods
-Deployments
-Services
-PersistentVolumeClaims
-ConfigMaps
-Secrets
-
-Dacă nu creezi namespace-ul tău:
-➡ TOTUL ajunge în default
-
-doar ca default detine si chestii care nu tin de aplicatia mea
-
-Ce este kube-system?
-
-Namespace INTERN Kubernetes
-Conține:
-DNS (CoreDNS)
-controller-e
-scheduler
-kube-proxy
-
-Ce este kube-public?
-
-namespace special
-conține informații publice despre cluster
-foarte rar folosit de aplicații
-
-Ce este default?
-
-namespace-ul implicit
-unde ajunge tot dacă NU specifici alt namespace
-
-
-### Creare fisiere YAML, pentru a avea datele persistente, avem nevoie de un PV și de un PV, apoi aplicarea lor
+## Pas 8. Verificare ingress-nginx
 
 ```bash
-kubectl apply -f kubernetes/mysql-pv.yaml
-kubectl apply -f kubernetes/mysql-pvc.yaml
+kubectl get pods -n ingress-nginx
 ```
 
-prima comanda:
-Kubernetes înregistrează un spațiu de stocare
-disponibil pentru aplicații
-la nivel de cluster.
+- Ar trebui sa arate astfel:
+```aiignore
+NAME                                       READY   STATUS    RESTARTS   AGE
+ingress-nginx-controller-c98c9b6d4-v4lx8   1/1     Running   0          158m
+```
+
+
+## Pas 9: Adaugam repo helm pentru prometheus-community
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+```
+
+## Pas 10: Deploy Prometheus si Grafana folosind kube-prometheus-stack ( adaugam monitoring-values.yaml pentru configurare custom pentru a persista datele)
+```bash 
+helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+  -n monitoring \
+  --create-namespace \
+  -f kubernetes/monitoring/monitoring-values.yaml
+```
+
+- Verificare Prometheus si Grafana Pods
+```bash 
+kubectl get pods -n monitoring
+```
+
+- Ar trebui sa arate astfel:
+```aiignore
+alertmanager-monitoring-kube-prometheus-alertmanager-0   2/2     Running   0          159m
+monitoring-grafana-6db8cb98bb-mdbg2                      3/3     Running   0          118m
+monitoring-kube-prometheus-operator-65c847d757-gp7cw     1/1     Running   0          160m
+monitoring-kube-state-metrics-69b6c7f8c-rfvvb            1/1     Running   0          160m
+monitoring-prometheus-node-exporter-8cqm2                1/1     Running   0          160m
+prometheus-monitoring-kube-prometheus-prometheus-0       2/2     Running   0          159m
+```
+
+## Pas 11. Deploy aplicatia e-commerce folosind helm chart-ul creat de noi
+
+```bash 
+helm upgrade --install ecommerce kubernetes/ecommerce-chart \
+  -n ecommerce \
+  --create-namespace
+```
+
+- Verificare pods in namespace ecommerce
+```bash
+kubectl get pods -n ecommerce
+```
+
+- Ar trebui sa arate astfel:
+```aiignore
+NAME                            READY   STATUS    RESTARTS   AGE
+adminer-5648678756-2q82w        1/1     Running   0          161m
+api-service-5c7cf697c9-bhmpj    1/1     Running   0          102m
+api-service-5c7cf697c9-lq6kx    1/1     Running   0          102m
+auth-service-5bdb7669d5-mfzzz   1/1     Running   0          161m
+auth-service-5bdb7669d5-q8sc4   1/1     Running   0          161m
+mysql-6dffc75df4-n4gw4          1/1     Running   0          161m
+portainer-67dfdf6f67-nmjt6      1/1     Running   0          161m
+```
+
+## Pas 12: Pentru a accesa Prometheus din browser, rulam comanda de port-forwarding
+```bash
+kubectl port-forward svc/monitoring-kube-prometheus-prometheus 9090:9090 -n monitoring
+```
+
+- Accesam Prometheus in browser la adresa:
+```aiignore
+http://localhost:9090
+```
+## Pas 13: Pentru a accesa Grafana din browser, rulam comanda de port-forwarding
+
+```bash
+kubectl port-forward svc/monitoring-grafana 3000:80 -n monitoring
+```
+
+- Accesam Grafana in browser la adresa:
+
+```aiignore
+http://localhost:3000
+```
+
+- Pentru a obtine parola de admin la Grafana, rulam comanda ( username-ul este admin ) :
+```bash
+kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo
+```
+
+- Puteti importa dashboard-ul realizat de noi pentru monitorizarea aplicatiei e-commerce din grafana/dashboards/Dashboard.json
+
+- Putem accesa portainer la adresa: 
+
+```aiignore
+http://localhost:30090
+```
+
+- Creem un cont nou cu username admin si orice parola dorim si rulam urmatoarea comanda pentru a avea acces la namespace-ul ecommerce ( apoi refreshuim pagina ):
+```bash
+kubectl create clusterrolebinding portainer-admin \
+--clusterrole=cluster-admin \
+--serviceaccount=ecommerce:default
+```
+
+- Pute accesa adminer la adresa:
+
+```aiignore
+http://localhost:30083
+```
+
+- Credentialele sunt: 
+
+```aiignore
+System: MySQL
+Server: mysql
+Username: ecommerce_user
+Password: ecommerce_pass
+Database: ecommerce_auth ( sau ecommerce_api )
+```
+
+## Pas 14: Accesare servicii din Postman
+
+- Datorita faptului ca am folosit Ingress-Nginx pentru a expune serviciile in afara cluster-ului,
+  putem accesa serviciile folosind urmatoarele URL-uri ( in functie de prefix api/auth se va face routing-ul catre
+  serviciul corespunzator ):
+
+- URL API service:
+
+```aiignore
+http://localhost:8088/api/
+```
+
+- URL Auth Service:
+
+```aiignore
+http://localhost:8088/auth/
+```
+
+- Au fost adaugate colectii postman in modulele api-service, respectiv auth-service pentru a folosi endpoint-urile noastre 
+
+
+## Linkuri utile
+
+- Verificare pods si servicii in namespace ecommerce
+
+```bash
+kubectl -n ecommerce get pods -o wide
+kubectl -n ecommerce get svc
+```
+
+- Pod-urile ar trebui sa arate astfel ( avem 2 replici pentru api-service si auth-service ):
+```aiignore
+NAME                            READY   STATUS    RESTARTS   AGE    IP            NODE                      NOMINATED NODE   READINESS GATES
+adminer-5648678756-2q82w        1/1     Running   0          179m   10.244.0.14   ecommerce-control-plane   <none>           <none>
+api-service-5c7cf697c9-bhmpj    1/1     Running   0          120m   10.244.0.30   ecommerce-control-plane   <none>           <none>
+api-service-5c7cf697c9-lq6kx    1/1     Running   0          120m   10.244.0.31   ecommerce-control-plane   <none>           <none>
+auth-service-5bdb7669d5-mfzzz   1/1     Running   0          179m   10.244.0.20   ecommerce-control-plane   <none>           <none>
+auth-service-5bdb7669d5-q8sc4   1/1     Running   0          179m   10.244.0.16   ecommerce-control-plane   <none>           <none>
+mysql-6dffc75df4-n4gw4          1/1     Running   0          179m   10.244.0.15   ecommerce-control-plane   <none>           <none>
+portainer-7c846db4c-fg2t4       1/1     Running   0          12m    10.244.0.32   ecommerce-control-plane   <none>           <none>
+```
+- Serviciile ar trebui sa arate astfel:
+```aiignore
+$ kubectl -n ecommerce get svc
+NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+adminer        NodePort    10.96.203.236   <none>        8080:30083/TCP   179m
+api-service    ClusterIP   10.96.76.199    <none>        8080/TCP         179m
+auth-service   ClusterIP   10.96.38.122    <none>        8080/TCP         179m
+mysql          ClusterIP   10.96.154.149   <none>        3306/TCP         179m
+portainer      NodePort    10.96.238.51    <none>        9000:30090/TCP   179m
+```
+
+- Vezi toate resursele din namespace
+
+```bash
+kubectl -n ecommerce get all
+```
+
+- Vezi toate resursele din namespace
+```bash
+kubectl -n ecommerce get all
+```
+
+- Logs
+```bash
+kubectl -n ecommerce logs deploy/api-service
+kubectl -n ecommerce logs deploy/auth-service
+kubectl -n ecommerce logs deploy/mysql
+```
+
+- Endpoints ( vedem adresele IP si porturile pod-urilor din spatele serviciilor )
+```bash
+kubectl -n ecommerce get endpoints api-service auth-service mysql
+```
+
+- Describe pod
+```bash
+kubectl -n ecommerce describe pod <pod-name>
+```
+
+- Restart deployment
+
+```bash
+kubectl rollout restart deployment/auth-service -n ecommerce
+```
 
 ### Verificare spatiu de stocare disponibil la nivel de cluster
+
 ```bash
 kubectl get pv
 kubectl get pvc 
 ```
 
-kubectl apply spune clusterului Kubernetes să creeze sau să actualizeze resursele descrise declarativ într-un fișier YAML.
-kubectl apply spune clusterului Kubernetes să creeze sau să actualizeze resursele descrise declarativ într-un fișier YAML.
 
-```karlaniculae@Alexes-MacBook-Air e-Commerce % kubectl get pv
-
-NAME       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                 STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
-mysql-pv   1Gi        RWO            Retain           Bound    ecommerce/mysql-pvc   manual         <unset>                          2m5s
-
-karlaniculae@Alexes-MacBook-Air e-Commerce % kubectl get pvc -n ecommerce
-
-NAME        STATUS   VOLUME     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
-mysql-pvc   Bound    mysql-pv   1Gi        RWO            manual         <unset>                 3m34s
-
+- Verificare helm releases in namespace ecommerce
+```bash
+helm list -n ecommerce
 ```
 
-Pentru a porni un pod de MySQL, avem nevoie de a seta variabilele MYSQL_USER și MYSQL_PASSWORD, cu configMap si secret pentru parola.
+## Cleanup
 
-## Se creeaza yaml-urile mysql-secret.yaml si mysql-configmap.yaml
-
-Când se va crea deployment-ul, o să folosim acest ConfigMap pentru a injecta variabilele de mediu.
-
-apoi
-
+- Stergere cluster kind
 ```bash
-kubectl apply -f kubernetes/mysql-configmap.yaml
-kubectl apply -f kubernetes/mysql-secret.yaml
-kubectl apply -f kubernetes/mysql-init-configmap.yaml
-kubectl apply -f kubernetes/mysql-deployment.yaml
-kubectl apply -f kubernetes/mysql-service.yaml
+kind delete cluster --name ecommerce
 ```
 
-mysql-configmap.yaml
-→ definește variabile non-sensibile (user MySQL)
-mysql-secret.yaml
-→ definește parolele MySQL (root + user)
-mysql-init-configmap.yaml
-→ conține scriptul SQL care creează bazele de date ecommerce_api și ecommerce_auth
-mysql-deployment.yaml
-→ pornește MySQL în Kubernetes și montează volumele (PVC + init SQL)
-mysql-service.yaml
-→ expune MySQL intern în cluster printr-un Service de tip ClusterIP
-
+- Stergere namespace 
 ```bash
-kubectl get pods -n ecommerce
-kubectl get svc -n ecommerce
-kubectl logs -n ecommerce -l app=mysql --tail=50
+kubectl delete namespace ecommerce
 ```
 
-dupa modif din application.properties
-```bash
-docker build -t ecommerce-auth:local services/auth-service
-```
-
-se incarca in kind
-```bash
-kind load docker-image ecommerce-auth:local --name ecommerce
-```
-restart deployment
-```bash
-kubectl rollout restart deployment/auth-service -n ecommerce
-
-```
-
-
-deci dupa creare yaml pt api si auth
+- Stergere e-commerce helm release
 
 ```bash
-# build
-docker build -t ecommerce-auth:local services/auth-service
-docker build -t ecommerce-api:local  services/api-service
-
-# load in kind
-kind load docker-image ecommerce-auth:local --name ecommerce
-kind load docker-image ecommerce-api:local  --name ecommerce
-
-# apply k8s
-kubectl apply -f kubernetes/auth-deployment.yaml
-kubectl apply -f kubernetes/api.yaml
-
-# verify
-kubectl get pods -n ecommerce
-kubectl get svc -n ecommerce
-```
-
-OUTPUT
-```bash
-karlaniculae@Alexes-MacBook-Air e-Commerce % kubectl get pods -n ecommerce
-NAME                            READY   STATUS             RESTARTS   AGE
-api-service-59d665d94c-bmcjz    0/1     Pending            0          0s
-auth-service-7b59775dc8-lstfz   0/1     ImagePullBackOff   0          32m
-mysql-5d47c9d6b7-gnjlj          1/1     Running            0          169m
-karlaniculae@Alexes-MacBook-Air e-Commerce % kubectl get svc -n ecommerce
-NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-api-service    NodePort    10.96.55.56     <none>        8080:30080/TCP   0s
-auth-service   NodePort    10.96.222.115   <none>        8081:30081/TCP   32m
-mysql          ClusterIP   10.96.186.94    <none>        3306/TCP         169m
-```
-
-```bash
- e-Commerce % kubectl get pods -n ecommerce
-kubectl describe pod -n ecommerce -l app=api-service | tail -n 30
-```
-describe îți arată detalii complete despre un pod, nu doar statusul scurt din get pods.
-Include:
-pe ce node rulează
-ce image folosește
-ce env vars are
-ce ports are
-ce volume are
-Events (cea mai importantă parte)
-→ aici vezi de ce nu pornește: ImagePull, CrashLoopBackOff, etc.
-
-
-
-### Verificare bază de date MySQL
-
-Pentru a verifica faptul că MySQL rulează corect și că bazele de date au fost create automat,
-am rulat următoarea comandă:
-
-```bash
-kubectl exec -n ecommerce -it deploy/mysql -- \
-  mysql -uroot -p'rootpass' -e "SHOW DATABASES;"
-```
-
-### Verificare bază de date MySQL
-
-Pentru a verifica faptul că MySQL rulează corect și că bazele de date au fost create automat,
-am rulat următoarea comandă:
-
-```bash
-kubectl exec -n ecommerce -it deploy/mysql -- \
-  mysql -uroot -p'rootpass' -e "SHOW DATABASES;"
-```
-
-Configurația bazei de date pentru auth-service este injectată prin variabile de mediu
-definite în Kubernetes (Deployment), conform principiilor cloud-native.
-
-Setările din application.properties sunt suprascrise la rularea în cluster.
-
-
-kubectl apply -f kubernetes/portainer-deployment.yaml
-kubectl apply -f kubernetes/portainer-service.yaml
-
-kubectl get pods -n ecommerce
-kubectl get svc  -n ecommerce
-
-http://localhost:9000
-
-kubectl create clusterrolebinding portainer-admin \
---clusterrole=cluster-admin \
---serviceaccount=ecommerce:default
-
-
-
-## Get grafana local instance passowrd: 
-
-```bash
-kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo
+helm uninstall ecommerce -n ecommerce
 ```
