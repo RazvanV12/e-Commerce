@@ -300,6 +300,12 @@ kubectl -n ecommerce describe pod <pod-name>
 kubectl rollout restart deployment/auth-service -n ecommerce
 ```
 
+- Restart portainer deployment
+
+```bash
+kubectl rollout restart deployment  -n ecommerce portainer
+```
+
 ### Verificare spatiu de stocare disponibil la nivel de cluster
 
 ```bash
